@@ -27,6 +27,25 @@ public class InsSortBenchmark {
         long totalTime = 0;
         Random random = new Random();
 
+        Config config;
+        try{
+            config = Config.load(InsertionSortComparator.class);
+        } catch (IOException e){
+            throw new RuntimeException(e);
+        }
+
+        Comparator<Integer> comparator = Comparator.naturalOrder();
+        InsertionSortComparator<Integer> sorter = new InsertionSortComparator<>(
+                comparator, n, 1, config);
+
+        for(int i = 0; i < 10; i++) {
+            Integer[] warmupArray = new Integer[n];
+            for (int j = 0; j < n; j++) {
+                warmupArray[j] = random.nextInt(n);
+            }
+            sorter.sort(warmupArray,0,n);
+        }
+
         for(int t = 0; t < numRuns; t++){
             Integer[] array = new Integer[n];
 
@@ -54,17 +73,6 @@ public class InsSortBenchmark {
                 default:
                     throw new IllegalArgumentException("Unknown type: " + type);
             }
-
-            Config config;
-            try{
-                config = Config.load(InsertionSortComparator.class);
-            } catch (IOException e){
-                throw new RuntimeException(e);
-            }
-
-            Comparator<Integer> comparator = Comparator.naturalOrder();
-            InsertionSortComparator<Integer> sorter = new InsertionSortComparator<>(
-                    comparator, n, 1, config);
 
             long startTime = System.nanoTime();
             sorter.sort(array,0,n);
