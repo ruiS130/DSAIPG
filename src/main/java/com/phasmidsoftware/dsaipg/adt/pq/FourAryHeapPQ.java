@@ -117,18 +117,18 @@ public class FourAryHeapPQ<K> {
         return sb.toString();
     }
 
-        public static void main(String[] args) {
-        Comparator<Integer> compare = Integer::compareTo;
-        FourAryHeapPQ<Integer> heap1 = new FourAryHeapPQ<>(10, compare, true);
-
-        heap1.insert(1);
-        heap1.insert(244);
-        heap1.insert(34);
-        heap1.insert(4);
-
-        System.out.println(heap1.toString());
-        System.out.println(heap1.peek());
-        System.out.println(heap1.remove());
-        System.out.println(heap1.toString());
-    }
+//        public static void main(String[] args) {
+//        Comparator<Integer> compare = Integer::compareTo;
+//        FourAryHeapPQ<Integer> heap1 = new FourAryHeapPQ<>(10, compare, true);
+//
+//        heap1.insert(1);
+//        heap1.insert(244);
+//        heap1.insert(34);
+//        heap1.insert(4);
+//
+//        System.out.println(heap1.toString());
+//        System.out.println(heap1.peek());
+//        System.out.println(heap1.remove());
+//        System.out.println(heap1.toString());
+//    }
 }
