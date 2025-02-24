@@ -1,18 +1,18 @@
 package com.phasmidsoftware.dsaipg.adt.pq;
 
-import com.phasmidsoftware.dsaipg.util.Benchmark_Timer;
-import org.checkerframework.checker.units.qual.K;
-
 import java.util.Comparator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class BinrayPQ<K> {
+public class BinaryHeapPQ<K> {
 
     private K[] heap;
     private int size;
     private final Comparator<K> comparator;
     private final boolean max;
 
-    public BinrayPQ(int capacity, boolean max, Comparator<K> comparator) {
+    public BinaryHeapPQ(int capacity, boolean max, Comparator<K> comparator) {
         this.comparator = comparator;
         this.max = max;
         this.heap = (K[]) new Object[capacity+1];
@@ -35,6 +35,13 @@ public class BinrayPQ<K> {
         swim(size);
     }
 
+    public K peek() {
+        if(isEmpty()) {
+            throw new RuntimeException("Heap is empty");
+        }
+        return heap[1];
+    }
+
     public K remove() {
         if(isEmpty()) {
             throw new RuntimeException("Heap is empty");}
@@ -47,8 +54,8 @@ public class BinrayPQ<K> {
     }
 
     public void swim(int k) {
-        while(k>1 && less((k/2), k)) {
-            swap(k, (k/2));
+        while(k>1 && compareLess((k/2), k)) {
+            swap(k,(k/2));
             k = k/2;
         }
     }
@@ -56,10 +63,10 @@ public class BinrayPQ<K> {
     public void sink(int k) {
         while(k*2 <=size) {
             int j = k*2;
-            if(j<size && less(j, j+1)) {
+            if(j<size && compareLess(j, j+1)) {
                 j++;
             }
-            if(!less(k, j)) {
+            if(!compareLess(k, j)){
                 break;
             }
             swap(k, j);
@@ -73,17 +80,36 @@ public class BinrayPQ<K> {
         heap[j] = tmp;
     }
 
-    private boolean less(int i, int j) {
-        int cmp = comparator.compare(heap[i], heap[j]);
-        if(max) {
-            return cmp < 0;
+    private boolean compareLess(int i, int j) {
+        int compare = comparator.compare(heap[i], heap[j]);
+        if(max==true) {
+            return compare < 0;
         } else {
-            return cmp > 0;
+            return compare > 0;
         }
     }
 
-    public static void main(String[] args) {
-        Comparator<Integer> cmp = Integer::compareTo;
-        PriorityQueue<Integer> pq = new PriorityQueue<>(1, cmp);
+    public void buildHeap() {
+        for(int i = size / 2; i>=1; i--) {
+            sink(i);
+        }
     }
+
+    public void snake(int index){
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 1; i <= size; i++){
+            sb.append(heap[i]).append(" ");
+        }
+        return sb.toString();
+    }
+
+//    public static void main(String[] args) {
+//        Comparator<Integer> compare = Integer::compareTo;
+//        BinaryHeapPQ<Integer> maxHeap = new BinaryHeapPQ<>(10, true, cmp);
+//    }
 }
