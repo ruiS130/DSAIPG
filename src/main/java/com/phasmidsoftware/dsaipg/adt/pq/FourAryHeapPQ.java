@@ -4,17 +4,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class FourAryHeapPQ<K> {
+public class FourAryHeapPQ<Key extends Comparable<Key>> {
 
-    private K[] heap;
+    private Key[] heap;
     private int size;
-    private final Comparator<K> comparator;
+    private final Comparator<Key> comparator;
     private final boolean max;
 
-    public FourAryHeapPQ(int capacity, Comparator<K> comparator, boolean max) {
+    public FourAryHeapPQ(int capacity, Comparator<Key> comparator, boolean max) {
         this.comparator = comparator;
         this.max = max;
-        heap = (K[]) new Object[capacity + 1];
+        heap = (Key[]) new Comparable[capacity + 1];
         this.size = 0;
     }
 
@@ -26,7 +26,7 @@ public class FourAryHeapPQ<K> {
         return size;
     }
 
-    public void insert(K key) {
+    public void insert(Key key) {
         if(size >= heap.length - 1) {
             throw new RuntimeException("Heap is full");
         }
@@ -34,17 +34,17 @@ public class FourAryHeapPQ<K> {
         swim(size);
     }
 
-    public K peek() {
+    public Key peek() {
         if(isEmpty()) {
             throw new RuntimeException("Heap is empty");
         }
         return heap[1];
     }
 
-    public K remove() {
+    public Key remove() {
         if(isEmpty()) {
             throw new RuntimeException("Heap is empty");}
-        K top =  heap[1];
+        Key top =  heap[1];
         swap(1,size);
         heap[size] = null;
         size--;
@@ -87,7 +87,7 @@ public class FourAryHeapPQ<K> {
     }
 
     private void swap(int i, int j) {
-        K tmp = heap[i];
+        Key tmp = heap[i];
         heap[i] = heap[j];
         heap[j] = tmp;
     }

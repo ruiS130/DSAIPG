@@ -5,17 +5,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class BinaryHeapPQ<K> {
+public class BinaryHeapPQ<Key extends Comparable<Key>> {
 
-    private K[] heap;
+    private Key[] heap;
     private int size;
-    private final Comparator<K> comparator;
+    private final Comparator<Key> comparator;
     private final boolean max;
 
-    public BinaryHeapPQ(int capacity, boolean max, Comparator<K> comparator) {
+    public BinaryHeapPQ(int capacity, boolean max, Comparator<Key> comparator) {
         this.comparator = comparator;
         this.max = max;
-        this.heap = (K[]) new Object[capacity+1];
+        this.heap = (Key[]) new Comparable[capacity+1];
         this.size = 0;
     }
 
@@ -27,7 +27,7 @@ public class BinaryHeapPQ<K> {
         return size;
     }
 
-    public void insert(K key) {
+    public void insert(Key key) {
         if(size >= heap.length - 1) {
             throw new RuntimeException("Heap is full");
         }
@@ -35,17 +35,17 @@ public class BinaryHeapPQ<K> {
         swim(size);
     }
 
-    public K peek() {
+    public Key peek() {
         if(isEmpty()) {
             throw new RuntimeException("Heap is empty");
         }
         return heap[1];
     }
 
-    public K remove() {
+    public Key remove() {
         if(isEmpty()) {
             throw new RuntimeException("Heap is empty");}
-        K top =  heap[1];
+        Key top =  heap[1];
         swap(1,size);
         heap[size] = null;
         size--;
@@ -75,7 +75,7 @@ public class BinaryHeapPQ<K> {
     }
 
     private void swap(int i, int j) {
-        K tmp = heap[i];
+        Key tmp = heap[i];
         heap[i] = heap[j];
         heap[j] = tmp;
     }
