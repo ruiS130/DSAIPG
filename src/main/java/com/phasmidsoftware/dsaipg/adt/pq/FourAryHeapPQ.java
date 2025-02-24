@@ -108,6 +108,10 @@ public class FourAryHeapPQ<K> {
         }
     }
 
+    public void snake() {
+        buildHeap();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

@@ -95,8 +95,8 @@ public class BinaryHeapPQ<K> {
         }
     }
 
-    public void snake(int index){
-
+    public void snake(){
+        buildHeap();
     }
 
     @Override

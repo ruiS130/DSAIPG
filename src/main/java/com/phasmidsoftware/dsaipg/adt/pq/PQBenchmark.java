@@ -80,7 +80,7 @@ public class PQBenchmark {
         for(int i = 0; i < limit; i++) {
             pq.insert(random.nextInt(100000));
         }
-        pq.buildHeap();
+        pq.snake();
 
         for (int i = 0; i < limit; i++) {
             int value =  random.nextInt(100000);
@@ -144,7 +144,7 @@ public class PQBenchmark {
         for(int i = 0; i < limit; i++) {
             pq.insert(random.nextInt(100000));
         }
-        pq.buildHeap();
+        pq.snake();
 
         for (int i = 0; i < limit; i++) {
             int value =  random.nextInt(100000);
