@@ -39,16 +39,25 @@ final class ParSort {
      * @param to    the ending index (exclusive) of the portion of the array to be sorted
      */
     public static void sort(int[] array, int from, int to) {
-        if (to - from >= cutoff) {
-            CompletableFuture<int[]> completableFuture1 = null;
-            CompletableFuture<int[]> completableFuture2 = null;
-            // TO BE IMPLEMENTED 
-            // END SOLUTION
-            CompletableFuture<int[]> completableFuture = completableFuture1.thenCombine(completableFuture2, ParSort::doMerge);
-            completableFuture.whenComplete((result, throwable) -> System.arraycopy(result, 0, array, from, result.length));
-            completableFuture.join();
-        } else
+        if(to - from <= cutoff) {
+//            System.out.println("Sequential sort: " + (to - from) + ", Cutoff: " + cutoff);
             Arrays.sort(array, from, to);
+        } else {
+            try {
+                int mid = from + (to - from) / 2;
+//            System.out.println("Parallel sort: " + (to - from) + ", Cutoff: " + cutoff);
+                CompletableFuture<int[]> completableFuture1 = CompletableFuture.supplyAsync(()->sortRecursive(array, from, mid));
+                CompletableFuture<int[]> completableFuture2 = CompletableFuture.supplyAsync(()->sortRecursive(array, mid, to));
+
+                int[] left = completableFuture1.join();
+                int[] right = completableFuture2.join();
+                int[] merged = doMerge(left, right);
+                System.arraycopy(merged, 0, array, from, merged.length);
+            } catch (Exception ex) {
+                System.err.println("Error: " + ex.getMessage());
+                ex.printStackTrace(System.err);
+            }
+        }
     }
 
     /**
@@ -63,10 +72,18 @@ final class ParSort {
      */
     static int[] sortRecursive(int[] array, int from, int to) {
         int[] result = new int[to - from];
-        // TO BE IMPLEMENTED 
-         // NOTE you need to do something here so that result is the sorted version of array.
-        // END SOLUTION
-        return result;
+        System.arraycopy(array, from, result, 0, result.length);
+        // NOTE you need to do something here so that result is the sorted version of array.
+        if(to - from <= 1) {
+            return result;
+        } else {
+            int mid  = from + (to - from) / 2;
+            int [] left = sortRecursive(array, from, mid);
+            int [] right = sortRecursive(array, mid, to);
+            int[] merged = doMerge(left, right);
+            System.arraycopy(merged, 0, result, 0, merged.length);
+            return result;
+        }
     }
 
     /**
