@@ -48,11 +48,13 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
     }
 
     private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
-        return new InsertionSort<>(helper.clone("MergeSort: insertion sort"));
+        Helper<X> helper1 = helper.clone("MergerSort: insertionSort");
+        return new InsertionSort<>(helper1);
     }
 
     public X[] sort(X[] xs, boolean makeCopy) {
         getHelper().init(xs.length);
+        insertionSort.getHelper().init(xs.length);
         additionalMemory(xs.length);
         X[] result = makeCopy ? Arrays.copyOf(xs, xs.length) : xs;
         sort(result, 0, result.length);
@@ -62,9 +64,15 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
 
     public void sort(X[] a, int from, int to) {
         Config config = helper.getConfig();
+
+        System.out.println("insurance: " + config.getBoolean(MERGESORT, INSURANCE));
+        System.out.println("nocopy: " + config.getBoolean(MERGESORT, NOCOPY));
+
         boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
         // CONSIDER don't copy but just allocate according to the xs/aux interchange optimization
         @SuppressWarnings("unchecked") X[] aux = noCopy ? helper.copyArray(a) : (X[]) new Comparable[a.length];
+//        @SuppressWarnings("unchecked") X[] aux = (X[]) new Comparable[a.length];
+//        System.arraycopy(a, 0, aux, 0, a.length);
         sort(a, aux, from, to);
     }
 
@@ -76,9 +84,16 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
             insertionSort.sort(a, from, to);
             return;
         }
+        int mid = from + (to - from) / 2;
 
-        // TO BE IMPLEMENTED  : implement merge sort with insurance and no-copy optimizations
-throw new RuntimeException("implementation missing");
+        sort(aux, a, from, mid);
+        sort(aux, a, mid, to);
+        if (insurance && helper.less(aux[mid - 1], aux[mid])) {
+            System.arraycopy(aux, from, a, from, to - from);
+            return;
+        }
+
+        merge(aux, a, from, mid, to);
     }
 
     // CONSIDER combine with MergeSortBasic, perhaps.

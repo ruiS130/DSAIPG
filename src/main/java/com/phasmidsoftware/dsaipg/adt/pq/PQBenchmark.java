@@ -9,9 +9,9 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class PQBenchmark {
-    private static final int N = 4095;
-    private static final int numInsert = 16000;
-    private static final int numDelete = 4000;
+    private static final int N = 800000;
+    private static final int numInsert = 3200000;
+    private static final int numDelete = 640000;
 
     public static void main(String[] args) {
         Comparator<Integer> comparator = Integer::compareTo;
