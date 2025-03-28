@@ -49,6 +49,7 @@ public class SortBenchmark {
      * @throws IOException If an IO error occurs during loading configuration or execution.
      */
     public static void main(String[] args) throws IOException {
+
         Config config = Config.load(SortBenchmark.class);
         logger.info("!!!!!!!!!!!!!!!!!!!! SortBenchmark Start !!!!!!!!!!!!!!!!!!!!\n");
         logger.info("SortBenchmark.main: version " + config.get("sortbenchmark", "version") + " with word counts: " + Arrays.toString(args));

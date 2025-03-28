@@ -169,6 +169,23 @@ public class HeapSortTest {
         assertEquals(944, compares); // TODO check this.
     }
 
+    @Test
+    public void testSortWithSwaps() {
+        Integer[] xs = new Integer[]{5,5,5,5};
+        Config config = setupConfig("true", "false", "0", "1", "", "");
+        HeapSort<Integer> heapSort = new HeapSort<>(xs.length, config);
+
+        Helper<Integer> helper = heapSort.getHelper();
+        helper.init(xs.length);
+
+        heapSort.sort(xs, 0, xs.length);
+
+        long swapCount = helper.getSwaps();
+        System.out.println("swapCount: " + swapCount);
+
+        assertEquals(0, helper.getSwaps());
+    }
+
     final static LazyLogger logger = new LazyLogger(HeapSort.class);
 
 }

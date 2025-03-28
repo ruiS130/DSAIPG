@@ -79,9 +79,10 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
 
         // XXX sort-down phase
         Helper<X> helper = getHelper();
-        // TODO we over-count hits in the swap operation -- fix it.
         for (int i = array.length - 1; i >= 1; i--) {
-            helper.swap(array, 0, i);
+            if(array[0].compareTo(array[i]) != 0) {
+                helper.swap(array, 0, i);
+            }
             heapify(array, i, 0);
         }
     }
@@ -113,14 +114,13 @@ public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<
      *                 subtree rooted at this index satisfies the max-heap property upon completion.
      */
     private void heapify(X[] array, int heapSize, int index) {
-        // TODO we over-count hits in the swap operation -- fix it.
         Helper<X> helper = getHelper();
         final int left = index * 2 + 1;
         final int right = index * 2 + 2;
         int largest = index;
         if (left < heapSize && helper.compare(array, largest, left) < 0) largest = left;
         if (right < heapSize && helper.compare(array, largest, right) < 0) largest = right;
-        if (index != largest) {
+        if (index != largest && array[index].compareTo(array[largest]) != 0) {
             helper.swap(array, index, largest);
             heapify(array, heapSize, largest);
         }

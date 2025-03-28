@@ -47,8 +47,13 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         insertionSort = setupInsertionSort(getHelper());
     }
 
+    @Override
+    public X[] sort(X[] array) throws SortException {
+        return sort(array, true);
+    }
+
     private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
-        Helper<X> helper1 = helper.clone("MergerSort: insertionSort");
+        Helper<X> helper1 = helper.clone("MergeSort: insertionSort");
         return new InsertionSort<>(helper1);
     }
 
@@ -57,42 +62,45 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         insertionSort.getHelper().init(xs.length);
         additionalMemory(xs.length);
         X[] result = makeCopy ? Arrays.copyOf(xs, xs.length) : xs;
-        sort(result, 0, result.length);
+        boolean noCopy = getHelper().getConfig().getBoolean(MERGESORT, NOCOPY);
+        @SuppressWarnings("unchecked")
+        X[] aux = noCopy ? getHelper().copyArray(result) : (X[]) new Comparable[result.length];
+        mergeSort(result, aux, 0, result.length);
         additionalMemory(-xs.length);
         return result;
     }
 
     public void sort(X[] a, int from, int to) {
-        Config config = helper.getConfig();
-
-        System.out.println("insurance: " + config.getBoolean(MERGESORT, INSURANCE));
-        System.out.println("nocopy: " + config.getBoolean(MERGESORT, NOCOPY));
-
-        boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
-        // CONSIDER don't copy but just allocate according to the xs/aux interchange optimization
-        @SuppressWarnings("unchecked") X[] aux = noCopy ? helper.copyArray(a) : (X[]) new Comparable[a.length];
-//        @SuppressWarnings("unchecked") X[] aux = (X[]) new Comparable[a.length];
-//        System.arraycopy(a, 0, aux, 0, a.length);
-        sort(a, aux, from, to);
+        getHelper().init(a.length);
+        insertionSort.getHelper().init(a.length);
+//        System.out.println("insurance: " + config.getBoolean(MERGESORT, INSURANCE));
+//        System.out.println("nocopy: " + config.getBoolean(MERGESORT, NOCOPY));
+        boolean noCopy = getHelper().getConfig().getBoolean(MERGESORT, NOCOPY);
+        @SuppressWarnings("unchecked")
+        X[] aux = noCopy ? getHelper().copyArray(a) : (X[]) new Comparable[a.length];
+        mergeSort(a, aux, from, to);
     }
 
-    private void sort(X[] a, X[] aux, int from, int to) {
-        Config config = helper.getConfig();
-        boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
-        boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
-        if (to <= from + helper.cutoff()) { // XXX check that a cutoff value of 1 effectively stops the cutoff mechanism.
+    private void mergeSort(X[] a, X[] aux, int from, int to) {
+        if (to - from <= getHelper().cutoff()) { // XXX check that a cutoff value of 1 effectively stops the cutoff mechanism.
             insertionSort.sort(a, from, to);
             return;
         }
         int mid = from + (to - from) / 2;
-
-        sort(aux, a, from, mid);
-        sort(aux, a, mid, to);
-        if (insurance && helper.less(aux[mid - 1], aux[mid])) {
-            System.arraycopy(aux, from, a, from, to - from);
-            return;
+        mergeSort(a, aux, from, mid);
+        mergeSort(a, aux, mid, to);
+//        if(getHelper().getConfig().getBoolean(MERGESORT, INSURANCE) && !getHelper().less(a[mid], a[mid-1])) {
+//            return;
+//        }
+        if(getHelper().getConfig().getBoolean(MERGESORT, INSURANCE)) {
+            getHelper().incrementCompares();
+            if (!getHelper().less(a[mid], a[mid-1])) {
+                return;
+            }
         }
-
+        for (int i = from; i < to; i++) {
+            getHelper().copy(a[i], aux, i);
+        }
         merge(aux, a, from, mid, to);
     }
 
@@ -100,22 +108,20 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
     private void merge(X[] sorted, X[] result, int from, int mid, int to) {
         int i = from;
         int j = mid;
-        X v = helper.get(sorted, i);
-        X w = helper.get(sorted, j);
         for (int k = from; k < to; k++) {
             if (i >= mid) {
-                helper.copy(w, result, k);
-                if (++j < to) w = helper.get(sorted, j);
+                getHelper().copy(getHelper().get(sorted, j), result, k);
+                j++;
             } else if (j >= to) {
-                helper.copy(v, result, k);
-                if (++i < mid) v = helper.get(sorted, i);
-            } else if (helper.less(w, v)) {
-                helper.incrementFixes(mid - i);
-                helper.copy(w, result, k);
-                if (++j < to) w = helper.get(sorted, j);
+                getHelper().copy(getHelper().get(sorted, i), result, k);
+                i++;
+            } else if (getHelper().less(getHelper().get(sorted, j), getHelper().get(sorted, i))) {
+                getHelper().incrementFixes(mid - i);
+                getHelper().copy(getHelper().get(sorted, j), result, k);
+                j++;
             } else {
-                helper.copy(v, result, k);
-                if (++i < mid) v = helper.get(sorted, i);
+                getHelper().copy(getHelper().get(sorted, i), result, k);
+                i++;
             }
         }
     }
@@ -137,8 +143,6 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
     }
 
     private final InsertionSort<X> insertionSort;
-
-
     private int arrayMemory = -1;
     private int additionalMemory;
     private int maxMemory;
